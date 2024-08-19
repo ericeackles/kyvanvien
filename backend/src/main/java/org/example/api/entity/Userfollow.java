@@ -16,21 +16,29 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Userfollow {
+public class UserFollow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "follow_id")
     private Long followId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "story_id", nullable = false)
     @JsonBackReference
     private Story story;
+
+    @ManyToOne
+    @JoinColumn(name = "chapter_id", nullable = true)
+    @JsonBackReference
+    private Chapter chapter;
+
+    @Column(name = "status_follow", nullable = false)
+    private int statusFollow;
 
     @Column(name = "followed_at")
     private Date followedAt;

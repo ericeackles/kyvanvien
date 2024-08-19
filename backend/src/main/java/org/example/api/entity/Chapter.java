@@ -1,6 +1,8 @@
 package org.example.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class Chapter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +28,7 @@ public class Chapter {
 
     @ManyToOne
     @JoinColumn(name = "story_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnore
     private Story story;
 
     @Column(name = "chapter_number")
@@ -43,10 +46,15 @@ public class Chapter {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    @OneToMany(mappedBy = "chapter")
-    @JsonManagedReference
+    @OneToMany
+    @JsonIgnore
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "chapter")
-    private List<Userprogress> progressList;
+    @OneToMany
+    @JsonBackReference
+    private List<UserProgress> progressList;
+
+    @OneToMany
+    @JsonBackReference
+    private List<UserFollow> followList;
 }

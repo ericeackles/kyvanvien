@@ -1,6 +1,7 @@
 package org.example.api.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ public class Listgift {
     @Column(name = "gift_price")
     private double giftPrice;
 
-    @OneToMany(mappedBy = "gift")
-    @JsonManagedReference
+    @OneToMany
+    @JsonIgnore
     private List<Historygift> historyGifts;
 }

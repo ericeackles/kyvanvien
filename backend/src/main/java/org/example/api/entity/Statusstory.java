@@ -1,6 +1,7 @@
 package org.example.api.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class Statusstory {
     @Column(name = "status_name")
     private String statusName;
 
-    @OneToMany(mappedBy = "status")
-    @JsonManagedReference
+    @OneToMany
+    @JsonIgnore
     private Set<Story> stories;
 }

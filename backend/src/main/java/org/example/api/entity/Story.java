@@ -1,7 +1,7 @@
 package org.example.api.entity;
-
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -66,25 +66,30 @@ public class Story {
     private Date updatedAt;
 
     @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonIgnore
     private List<Chapter> chapters;
 
-    @OneToMany(mappedBy = "story")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "story")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Rating> ratings;
 
-    @OneToMany(mappedBy = "story")
-    @JsonManagedReference
-    private List<Userlike> likes;
+    @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<UserLike> likes;
 
-    @OneToMany(mappedBy = "story")
-    @JsonManagedReference
-    private List<Userfollow> follows;
+    @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<UserFollow> follows;
 
-    @OneToMany(mappedBy = "story")
-    private List<Userprogress> progressList;
+    @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<UserProgress> progressList;
+
+    @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<View> views;
 }

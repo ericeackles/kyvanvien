@@ -17,7 +17,7 @@ import lombok.Setter;
 public class Historytransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "historyTransaction_id")
+    @Column(name = "ht_id")
     private Long historyTransactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)

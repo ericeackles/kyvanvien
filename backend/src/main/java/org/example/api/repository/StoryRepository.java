@@ -17,7 +17,8 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
 
     @Query("SELECT s FROM Story s WHERE (:typeId IS NULL OR s.type.typeId = :typeId) " +
             "AND (:genreId IS NULL OR s.genre.genreId = :genreId) " +
-            "AND (:statusId IS NULL OR s.status.statusId = :statusId)")
+            "AND (:statusId IS NULL OR s.status.statusId = :statusId)" +
+            "ORDER BY s.createdAt DESC")
     List<Story> findByTypeGenreStatus(
             @Param("typeId") Long typeId,
             @Param("genreId") Long genreId,

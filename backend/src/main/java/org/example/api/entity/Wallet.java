@@ -34,6 +34,6 @@ public class Wallet {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @OneToMany(mappedBy = "wallet")
+    @OneToMany
     private List<Wallettransaction> transactions;
 }

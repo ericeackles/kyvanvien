@@ -1,5 +1,6 @@
 package org.example.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class Type {
     @Column(name = "type_name")
     private String typeName;
 
-    @OneToMany(mappedBy = "type")
-    @JsonManagedReference
+    @OneToMany
+    @JsonIgnore
     private Set<Story> stories;
 }

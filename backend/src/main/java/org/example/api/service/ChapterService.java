@@ -31,7 +31,7 @@ public class ChapterService {
                 .collect(Collectors.toList());
     }
 
-    public List<ChapterDTO> getChaptersByStoryIdByorder(Long storyId) {
+    public List<ChapterDTO> getChaptersByStoryIdByOrder(Long storyId) {
         // Fetch chapters by storyId
         List<Chapter> chapters = chapterRepository.findByStoryId(storyId);
 
@@ -59,12 +59,6 @@ public class ChapterService {
         chapterRepository.delete(chapter);
     }
 
-    public List<Chapter> getChaptersBySlugAndChapterNumber(String slug, int chapterNumber) {
-        Story story = storyRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Story not found with slug: " + slug));
-
-        return chapterRepository.findByStorySlugAndChapterNumber(slug, chapterNumber);
-    }
 
     public List<ChapterDTO> getChaptersByStorySlug(String slug) {
         Story story = storyRepository.findBySlug(slug)
@@ -75,6 +69,16 @@ public class ChapterService {
         return chapters.stream()
                 .map(ChapterMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+
+    public ChapterDTO getChapterByStoryAndl(String slug, int chapterNumber) {
+        Story story = storyRepository.findBySlug(slug)
+                .orElseThrow(() -> new RuntimeException("Story not found with slug: " + slug));
+
+
+        Chapter chapter = chapterRepository.findByStorySlugAndChapterNumber(slug, chapterNumber);
+        return chapter != null ? ChapterMapper.toDTO(chapter) : null;
     }
 
     public ChapterDTO getChapterByStoryAndChapterId(Long storyId, Long chapterId) {

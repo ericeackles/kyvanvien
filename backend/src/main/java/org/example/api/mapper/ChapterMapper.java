@@ -1,5 +1,6 @@
 package org.example.api.mapper;
 
+import lombok.AllArgsConstructor;
 import org.example.api.dto.ChapterDTO;
 import org.example.api.entity.Chapter;
 import org.example.api.entity.Story;
@@ -8,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class ChapterMapper {
 
-    @Autowired
     private StoryRepository storyRepository;
 
     public static ChapterDTO toDTO(Chapter chapter) {

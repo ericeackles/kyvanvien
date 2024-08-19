@@ -39,6 +39,13 @@ public class ChapterController {
         return ResponseEntity.ok(chapter);
     }
 
+    @GetMapping("/story/{slug}/number/{chapterNumber}")
+    public ResponseEntity<ChapterDTO> getChaptersBySlugAndChapterNumber(
+            @PathVariable String slug,
+            @PathVariable int chapterNumber) {
+        ChapterDTO chapter = chapterService.getChapterByStoryAndl(slug, chapterNumber);
+        return ResponseEntity.ok(chapter);
+    }
 
     @PostMapping
     public ResponseEntity<ChapterDTO> addChapter(@RequestBody ChapterDTO chapterDTO) {
@@ -54,14 +61,6 @@ public class ChapterController {
     @DeleteMapping("/{chapterId}")
     public void deleteChapter(@PathVariable Long chapterId) {
         chapterService.deleteChapter(chapterId);
-    }
-
-    @GetMapping("/story/{slug}/number/{chapterNumber}")
-    public ResponseEntity<List<Chapter>> getChaptersBySlugAndChapterNumber(
-            @PathVariable String slug,
-            @PathVariable int chapterNumber) {
-        List<Chapter> chapters = chapterService.getChaptersBySlugAndChapterNumber(slug, chapterNumber);
-        return ResponseEntity.ok(chapters);
     }
 
 

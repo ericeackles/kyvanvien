@@ -34,20 +34,41 @@ public class StoryService {
 
     private final ChapterRepository chapterRepository;
 
+    private final RatingRepository ratingRepository;
+
     public List<StoryDTO> fetchAllStories() {
         Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "id"));
 
         List<Story> stories = storyRepository.findAll(pageable).getContent();
 
         return stories.stream()
-                .map(StoryMapper::toDTO)
+                .map(story -> {
+                    // Đếm số chương cho mỗi story
+                    Long chapterCount = chapterRepository.countByStoryId(story.getId());
+                    // Sử dụng phương thức toDTO có chapterCount
+                    return StoryMapper.toDTO(story);
+                })
                 .collect(Collectors.toList());
     }
 
     public StoryDTO getStoryById(Long id) {
         Story story = storyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Story not found with ID: " + id));
-        return StoryMapper.toDTO(story);
+
+        // Đếm số lượng chương liên quan đến story này
+        Long chapterCount = chapterRepository.countByStoryId(id);
+
+        Long ratingCount = ratingRepository.countRatingsByStoryId(story.getId());
+        Double averageRating = ratingRepository.averageRatingByStoryId(story.getId());
+        averageRating = (averageRating != null) ? averageRating : 0.0;
+
+        // Map Story thành StoryDTO và set số lượng chương
+        StoryDTO storyDTO = StoryMapper.toDTO(story);
+        storyDTO.setChapterCount(chapterCount);  // Giả sử bạn đã thêm trường chapterCount vào StoryDTO
+        storyDTO.setRatingCount(ratingCount);
+        storyDTO.setAverageRating(averageRating);
+
+        return storyDTO;
     }
 
     public StoryDTO createStory(StoryDTO storyDTO) {
@@ -114,6 +135,9 @@ public class StoryService {
             existingStory.setType(type);
         }
 
+//        String slug = SlugGenerator.toSlug(storyDTO.getTitle());
+//        existingStory.setSlug(slug);
+
         existingStory.setSlug(storyDTO.getSlug());
 
         // Cập nhật các thuộc tính thời gian nếu cần
@@ -132,37 +156,54 @@ public class StoryService {
         storyRepository.delete(story);
     }
 
-    public List<StoryDTO> searchStories(String query) {
-        // Chuẩn hóa chuỗi tìm kiếm: loại bỏ dấu và chuyển sang chữ thường
-        String normalizedQuery = StringUtils.removeDiacritics(query).toLowerCase();
+//    public List<StoryDTO> searchStories(String query) {
+//        // Chuẩn hóa chuỗi tìm kiếm: loại bỏ dấu và chuyển sang chữ thường
+//        String normalizedQuery = StringUtils.removeDiacritics(query).toLowerCase();
+//
+//        // Lấy tất cả các story và lọc theo tiêu chí tìm kiếm đã chuẩn hóa
+//        List<Story> stories = storyRepository.findAll().stream()
+//                .filter(story -> {
+//                    String normalizedTitle = StringUtils.removeDiacritics(story.getTitle()).toLowerCase();
+//                    String normalizedAuthor = StringUtils.removeDiacritics(story.getAuthor()).toLowerCase();
+//                    return normalizedTitle.contains(normalizedQuery) || normalizedAuthor.contains(normalizedQuery);
+//                })
+//                .collect(Collectors.toList());
+//
+//        // Chuyển đổi danh sách Story entities thành StoryDTOs
+//        return stories.stream()
+//                .map(StoryMapper::toDTO) // Sử dụng phương thức static
+//                .collect(Collectors.toList());
+//    }
+public List<StoryDTO> searchStories(String query) {
+    // Chuẩn hóa chuỗi tìm kiếm: loại bỏ dấu và chuyển sang chữ thường
+    String normalizedQuery = StringUtils.removeDiacritics(query).toLowerCase();
 
-        // Lấy tất cả các story và lọc theo tiêu chí tìm kiếm đã chuẩn hóa
-        List<Story> stories = storyRepository.findAll().stream()
-                .filter(story -> {
-                    String normalizedTitle = StringUtils.removeDiacritics(story.getTitle()).toLowerCase();
-                    String normalizedAuthor = StringUtils.removeDiacritics(story.getAuthor()).toLowerCase();
-                    return normalizedTitle.contains(normalizedQuery) || normalizedAuthor.contains(normalizedQuery);
-                })
-                .collect(Collectors.toList());
+    // Lấy tất cả các story và lọc theo tiêu chí tìm kiếm đã chuẩn hóa
+    List<Story> stories = storyRepository.findAll().stream()
+            .filter(story -> {
+                String normalizedTitle = StringUtils.removeDiacritics(story.getTitle()).toLowerCase();
+                String normalizedAuthor = StringUtils.removeDiacritics(story.getAuthor()).toLowerCase();
+                return normalizedTitle.contains(normalizedQuery) || normalizedAuthor.contains(normalizedQuery);
+            })
+            .collect(Collectors.toList());
 
-        // Chuyển đổi danh sách Story entities thành StoryDTOs
-        return stories.stream()
-                .map(StoryMapper::toDTO) // Sử dụng phương thức static
-                .collect(Collectors.toList());
-    }
+    // Chuyển đổi danh sách Story entities thành StoryDTOs với chapterCount
+    return stories.stream()
+            .map(story -> {
+//                Long chapterCount = chapterRepository.countByStoryId(story.getId()); // Đếm số chương
+                return StoryMapper.toDTO(story); // Sử dụng phương thức static với chapterCount
+            })
+            .collect(Collectors.toList());
+}
 
-    public List<StoryDTO> filterStories(StoryDTO filterDTO) {
-        // Chuyển đổi các thuộc tính từ StoryDTO thành các tham số tìm kiếm
-        Long typeId = filterDTO.getTypeId();
-        Long genreId = filterDTO.getGenreId();
-        Long statusId = filterDTO.getStatusId();
 
-        // Tìm các story dựa trên các tham số lọc
+    public List<StoryDTO> filterStories(Long typeId, Long genreId, Long statusId) {
         List<Story> stories = storyRepository.findByTypeGenreStatus(typeId, genreId, statusId);
-
-        // Chuyển đổi các đối tượng Story thành StoryDTO
         return stories.stream()
-                .map(StoryMapper::toDTO)
+                .map(story -> {
+                Long chapterCount = chapterRepository.countByStoryId(story.getId()); // Đếm số chương
+                    return StoryMapper.toDTO(story); // Sử dụng phương thức static với chapterCount
+                })
                 .collect(Collectors.toList());
     }
 
@@ -176,6 +217,19 @@ public class StoryService {
     public StoryDTO getStoryBySlug(String slug) {
         Story story = storyRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Story not found with slug: " + slug));
-        return StoryMapper.toDTO(story);
+
+        Long chapterCount = chapterRepository.countByStoryId(story.getId()); // Đếm số chương
+
+        // Đếm số lượng rating và giá trị trung bình rating cho câu chuyện này
+        Long ratingCount = ratingRepository.countRatingsByStoryId(story.getId());
+        Double averageRating = ratingRepository.averageRatingByStoryId(story.getId());
+        averageRating = (averageRating != null) ? averageRating : 0.0;
+
+        StoryDTO storyDTO = StoryMapper.toDTO(story);
+        storyDTO.setChapterCount(chapterCount);
+        storyDTO.setRatingCount(ratingCount);
+        storyDTO.setAverageRating(averageRating);
+
+        return storyDTO; // Truyền thêm chapterCount vào phương thức toDTO
     }
 }

@@ -21,6 +21,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
 
+
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegisterUser registerUser) {
         System.out.println(registerUser);

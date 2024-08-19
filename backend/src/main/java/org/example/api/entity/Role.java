@@ -1,6 +1,7 @@
 package org.example.api.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,11 +27,8 @@ public class Role {
     @Column(name = "role_name")
     private String roleName;
 
-    @OneToMany(mappedBy = "role")
-    @JsonManagedReference
-    private Set<User> users;
+    @OneToMany
+    @JsonIgnore
+    private List<User> users;
 
-    @OneToMany(mappedBy = "role")
-    @JsonManagedReference
-    private List<Admin> admins;
 }

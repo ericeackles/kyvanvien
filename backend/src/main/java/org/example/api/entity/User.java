@@ -2,19 +2,18 @@ package org.example.api.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -39,43 +38,43 @@ public class User implements UserDetails {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    @JsonBackReference
+//    @JsonIgnore
     private Role role;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
-    private Set<Story> stories;
+    @OneToMany
+    @JsonIgnore
+    private List<Story> stories;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @OneToMany
+    @JsonIgnore
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @OneToMany
+    @JsonIgnore
     private List<Rating> ratings;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
-    private List<Userlike> likes;
+    @OneToMany
+    @JsonIgnore
+    private List<UserLike> likes;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
-    private List<Userfollow> follows;
+    @OneToMany
+    @JsonIgnore
+    private List<UserFollow> follows;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
-    private List<Userprogress> progressList;
+    @OneToMany
+    @JsonBackReference
+    private List<UserProgress> progressList;
 
     @OneToOne(mappedBy = "user")
-    @JsonManagedReference
+    @JsonIgnore
     private Wallet wallet;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @OneToMany
+    @JsonIgnore
     private List<Historygift> historyGifts;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @OneToMany
+    @JsonIgnore
     private List<Historytransaction> transactions;
 
     public User setId(Long id) {
@@ -110,7 +109,10 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<GrantedAuthority> list = List.of(
+                new SimpleGrantedAuthority(getRole().getRoleName())
+        );
+        return  list;
     }
 
     @Override

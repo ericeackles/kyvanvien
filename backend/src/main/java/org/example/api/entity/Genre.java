@@ -1,5 +1,6 @@
 package org.example.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,15 @@ public class Genre {
     @Column(name = "genre_name")
     private String genreName;
 
-    @OneToMany(mappedBy = "genre")
-    @JsonManagedReference
+    @Column(name = "slug")
+    private String slug;
+
+//    @OneToMany(mappedBy = "genre")
+//    @JsonManagedReference
+//    private Set<Story> stories;
+
+    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Story> stories;
+
 }
